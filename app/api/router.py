@@ -1,7 +1,12 @@
-#from app.api.features.schemas.schemas import RequestSchema, SpellingCheckerRequestArgs
 from fastapi import APIRouter, Depends
+from app.api.features.chatbot import chatbot_executor
+from app.api.features.schemas.schemas import ChatRequest, ChatResponse, Message
 from app.api.logger import setup_logger
 from app.api.auth.auth import key_check
+
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
 
 logger = setup_logger(__name__)
 router = APIRouter()
@@ -10,16 +15,18 @@ router = APIRouter()
 def read_root():
     return {"Hello": "World"}
 
-# @router.post("/check-spelling")
-# async def submit_tool( data: RequestSchema, _ = Depends(key_check)):
-#     logger.info(f"Loading request args...")
-#     args = SpellingCheckerRequestArgs(spelling_checker_schema=data)
-#     logger.info(f"Args. loaded successfully")
-
-#     chain = compile_chain()
-
-#     logger.info("Generating the spelling checking analysis")
-#     results = chain.invoke(args.validate_and_return())
-#     logger.info("The spelling checking analysis has been successfully generated")
-
-#     return results
+@router.post("/chat", response_model=ChatResponse)
+async def chat( request: ChatRequest, _ = Depends(key_check) ):
+    user_name = request.user.fullName
+    chat_messages = request.messages
+    user_query = chat_messages[-1].payload.text
+    
+    response = chatbot_executor(user_name=user_name, user_query=user_query, messages=chat_messages)
+    
+    formatted_response = Message(
+        role="ai",
+        type="text",
+        payload={"text": response}
+    )
+    
+    return ChatResponse(data=[formatted_response])
