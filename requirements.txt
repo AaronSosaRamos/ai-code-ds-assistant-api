@@ -1,0 +1,8 @@
+fastapi
+langchain
+langchain-google-genai
+langchain_core
+langchain-community
+uvicorn[standard]
+python-dotenv
+tqdm
