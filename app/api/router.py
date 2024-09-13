@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Depends
 from app.api.features.chatbot import chatbot_executor
 from app.api.features.schemas.schemas import ChatRequest, ChatResponse, Message
+from app.api.features.schemas.software_architecture_assistant_schemas import SoftwareArchitectureAssistantArgs
+from app.api.features.software_architecture_assistant import compile_workflow
 from app.api.logger import setup_logger
 from app.api.auth.auth import key_check
+
 
 from dotenv import load_dotenv, find_dotenv
 
@@ -30,3 +33,27 @@ async def chat( request: ChatRequest, _ = Depends(key_check) ):
     )
     
     return ChatResponse(data=[formatted_response])
+
+@router.post("/software-architecture-assistant")
+async def software_architecture_assistant( request: SoftwareArchitectureAssistantArgs, _ = Depends(key_check) ):
+    
+    try:
+        logger.info(f"Image URL loaded: {request.img_url}")
+
+        architecture_assistant = compile_workflow()
+        result = architecture_assistant.invoke(
+            {
+                "img_url": request.img_url,
+                "requirements": request.requirements,
+                "lang": request.lang
+            }
+        )
+    
+    except Exception as e:
+        error_message = f"Error in executor: {e}"
+        logger.error(error_message)
+        raise ValueError(error_message)
+    
+    return result
+    
+    return 
