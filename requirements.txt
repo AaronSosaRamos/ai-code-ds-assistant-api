@@ -6,3 +6,6 @@ langchain-community
 uvicorn[standard]
 python-dotenv
 tqdm
+langgraph
+langchain-openai
+openai
