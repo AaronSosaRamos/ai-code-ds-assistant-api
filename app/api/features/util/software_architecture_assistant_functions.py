@@ -32,14 +32,21 @@ def generate_architecture_description(state):
         "pt": "Analise a imagem e me dê a descrição da arquitetura com os seguintes detalhes: nome da arquitetura, camadas, componentes, serviços externos, eventos e descrição do fluxo de dados."
     }
 
+    format_message = {
+        "en": "Format the response in this format",
+        "es": "Da formato a la respuesta en este formato",
+        "fr": "Formatez la réponse dans ce format",
+        "de": "Formatieren Sie die Antwort in diesem Format",
+        "pt": "Formate a resposta neste formato"
+    }
+
     message_content = [
         {
             "type": "text",
-            "text": lang_message.get(state["lang"])
+            "text": lang_message.get(state['lang'])
         },
         {"type": "image_url", "image_url": state["img_url"]},
-        {"type": "text", "text": f"Answer in this language: {state['lang']}"},
-        {"type": "text", "text": f"Format the response in this format: {parser.get_format_instructions()}"}
+        {"type": "text", "text": f"{format_message.get(state['lang'])}: {parser.get_format_instructions()}"}
     ]
 
     message = HumanMessage(content=message_content)
