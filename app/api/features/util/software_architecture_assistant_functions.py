@@ -32,13 +32,22 @@ def generate_architecture_description(state):
         "pt": "Analise a imagem e me dê a descrição da arquitetura com os seguintes detalhes: nome da arquitetura, camadas, componentes, serviços externos, eventos e descrição do fluxo de dados."
     }
 
+    format_message = {
+        "en": "Format the response in this format",
+        "es": "Da formato a la respuesta en este formato",
+        "fr": "Formatez la réponse dans ce format",
+        "de": "Formatieren Sie die Antwort in diesem Format",
+        "pt": "Formate a resposta neste formato"
+    }
+
     message_content = [
         {
             "type": "text",
-            "text": lang_message.get(state["lang"], lang_message["en"])
+            "text": lang_message.get(state['lang'])
         },
         {"type": "image_url", "image_url": state["img_url"]},
-        {"type": "text", "text": f"Format the response in this format: {parser.get_format_instructions()}"}
+        {"type": "text", "text": f"You must provide all the answers in this language: {state['lang']}"},
+        {"type": "text", "text": f"{format_message.get(state['lang'])}: {parser.get_format_instructions()}"}
     ]
 
     message = HumanMessage(content=message_content)
@@ -70,6 +79,8 @@ def validate_architecture(state):
 
         Requirements:
         {requirements}
+                     
+        Answer in this language: {lang}
 
         Respond with suggestions for improvement or state if the architecture fully meets the requirements. Ensure your response follows the format specified in {json_parser.get_format_instructions()}.
         """)
@@ -103,6 +114,8 @@ def suggest_architecture_improvements(state):
         Requirements:
         {requirements}
 
+        Answer in this language: {lang}
+
         Respond with suggestions for improvement. Ensure your response follows the format specified in {json_parser.get_format_instructions()}.
         """)
     ]
@@ -130,6 +143,8 @@ def evaluate_architecture_quality(state):
 
         Architecture:
         {improved_architecture}
+                     
+        Answer in this language: {lang}
 
         Respond with a detailed evaluation of the quality attributes and ensure your response follows the format specified in {json_parser.get_format_instructions()}.
         """)
@@ -144,4 +159,3 @@ def evaluate_architecture_quality(state):
     return {
         "architecture_with_quality_attributes": parsed_result
     }
-
