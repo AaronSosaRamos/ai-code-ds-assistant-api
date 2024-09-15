@@ -46,6 +46,7 @@ def generate_architecture_description(state):
             "text": lang_message.get(state['lang'])
         },
         {"type": "image_url", "image_url": state["img_url"]},
+        {"type": "text", "text": f"You must provide all the answers in this language: {state['lang']}"},
         {"type": "text", "text": f"{format_message.get(state['lang'])}: {parser.get_format_instructions()}"}
     ]
 
