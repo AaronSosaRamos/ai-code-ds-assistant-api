@@ -9,3 +9,4 @@ tqdm
 langgraph
 langchain-openai
 openai
+tavily-python
