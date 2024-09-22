@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends
 from app.api.features.chatbot import chatbot_executor
+from app.api.features.schemas.codexpert_schema import CodeInput
 from app.api.features.schemas.schemas import ChatRequest, ChatResponse, Message
 from app.api.features.schemas.software_architecture_assistant_schemas import SoftwareArchitectureAssistantArgs
 from app.api.features.software_architecture_assistant import compile_workflow
+from app.api.features.codexpert import compile_workflow as compile_codexpert
 from app.api.logger import setup_logger
 from app.api.auth.auth import key_check
 
@@ -55,5 +57,28 @@ async def software_architecture_assistant( request: SoftwareArchitectureAssistan
         raise ValueError(error_message)
     
     return result
+
+@router.post("/codexpert")
+async def codexpert( request: CodeInput, _ = Depends(key_check) ):
     
-    return 
+    try:
+        logger.info(f"Args. loaded successfully: {request}")
+
+        codexpert = compile_codexpert()
+        result = codexpert.invoke(
+            {
+                "code": request.code,
+                "programming_language": request.programming_language,
+                "is_ai_related": request.is_ai_related,
+                "context": request.context
+            }
+        )
+
+        logger.info("CodeXpert worked successfully!")
+    
+    except Exception as e:
+        error_message = f"Error in executor: {e}"
+        logger.error(error_message)
+        raise ValueError(error_message)
+    
+    return result
